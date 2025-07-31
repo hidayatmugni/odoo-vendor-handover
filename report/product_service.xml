@@ -1,0 +1,199 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="paperformat_vendor_handover" model="report.paperformat">
+        <field name="name">Vendor Handover Format</field>
+        <field name="default" eval="False" />
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">15</field>
+        <field name="margin_bottom">15</field>
+        <field name="margin_left">15</field>
+        <field name="margin_right">15</field>
+        <field name="header_line" eval="False" />
+        <field name="header_spacing">20</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="report_vendor_service_handover" model="ir.actions.report">
+        <field name="name">Vendor Service Handover</field>
+        <field name="model">gm.product_service</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">gm_product_service.vendor_service_handover_report</field>
+        <field name="paperformat_id" ref="gm_product_service.paperformat_vendor_handover" />
+        <field name="print_report_name">('Vendor Service Handover - %s' % (object.name))</field>
+    </record>
+
+    <template id="vendor_service_handover_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="rec" t-value="doc['record']" />
+                <t t-set="formatted_date" t-value="doc['formatted_date']" />
+                <!-- <t t-call="web.external_layout"> -->
+                <div class="page">
+                    <!-- Header -->
+                    <div style="">
+                        <!-- Logo -->
+                        <div style="margin:10px 0 10px 0;">
+                            <t t-if="logo_url">
+                                <img t-att-src="logo_url" style="height: 80px;" />
+                            </t>
+                        </div>
+                        <!-- info -->
+                        <div style="font-size:14px; width:100%; display:table;">
+                            <!-- Kolom Outlet -->
+                            <div style="display:table-cell; width:50%; vertical-align:top;">
+                                <p style="margin: 0;padding-bottom:4px;">
+                                    <t t-esc="rec.outlet_id.name" />
+                                </p>
+                                <p style="margin: 0;padding-bottom:4px;">
+                                    <t t-esc="rec.outlet_id.partner_id.street" />
+                                </p>
+                                <p style="margin: 0;padding-bottom:4px;">
+                                    <t t-esc="rec.outlet_id.partner_id.city" />
+                                    <span> - </span>
+                                    <t t-esc="rec.outlet_id.partner_id.zip" />
+                                </p>
+                                <p style="margin: 0;padding-bottom:4px;">
+                                    <span>Telp : </span>
+                                    <t t-esc="rec.outlet_id.partner_id.mobile" />
+                                </p>
+                            </div>
+
+                            <!-- Kolom Vendor -->
+                            <div style="display:table-cell; width:50%; vertical-align:top;">
+                                <p style="margin: 0; font-weight:bold;padding-bottom:4px">Kepada
+                                    Yth.</p>
+                                <p style="margin: 0; font-weight:bold;padding-bottom:4px">
+                                    <t t-esc="rec.vendor_id.name" />
+                                </p>
+                                <p style="margin: 0;padding-bottom:4px;">
+                                    <t t-esc="rec.vendor_id.street" />
+                                </p>
+                                <p style="margin: 0;padding-bottom:4px;">
+                                    <t t-esc="rec.vendor_id.city" />
+                                    <span> - </span>
+                                    <t t-esc="rec.vendor_id.zip" />
+                                </p>
+                                <p t-if="rec.vendor_id.mobile or rec.vendor_id.phone"
+                                    style="margin: 0;padding-bottom:4px;">
+                                    <span>Telp : </span>
+                                    <t t-if="rec.vendor_id.mobile">
+                                        <t t-esc="rec.vendor_id.mobile" />
+                                    </t>
+                                    <t t-if="rec.vendor_id.mobile and rec.vendor_id.phone">
+                                        <span> / </span>
+                                    </t>
+                                    <t t-if="rec.vendor_id.phone">
+                                        <t t-esc="rec.vendor_id.phone" />
+                                    </t>
+                                </p>
+
+                            </div>
+                        </div>
+
+                        <!-- end info -->
+                    </div>
+
+                    <!-- Detail Dokumen -->
+                    <div
+                        style="font-size: 14px; margin-bottom: 20px; display: table; width: 100%;margin-top: 30px;">
+                        <!-- Kolom Kiri -->
+                        <div
+                            style="display: table-cell; width: 50%; vertical-align: top; padding-right: 10px;">
+                            <div style="margin-bottom: 4px;">
+                                <span style="font-weight: bold;">ID Document: </span>
+                                <span t-field="rec.name" />
+                            </div>
+                            <div style="margin-bottom: 4px;">
+                                <span style="font-weight: bold;">Vendor: </span>
+                                <span t-field="rec.vendor_id.name" />
+                            </div>
+                            <div style="margin-bottom: 4px;">
+                                <span style="font-weight: bold;">Nomor Invoice: </span>
+                                <span t-field="rec.invoice_number" />
+                            </div>
+                        </div>
+
+                        <!-- Kolom Kanan -->
+                        <div
+                            style="display: table-cell; width: 50%; vertical-align: top;">
+                            <div style="margin-bottom: 4px;">
+                                <span style="font-weight: bold;">Tanggal Dokumen: </span>
+                                <t t-esc="formatted_date" />
+                            </div>
+                            <div style="margin-bottom: 4px;">
+                                <span style="font-weight: bold;">Lokasi: </span>
+                                <span t-esc="rec.outlet_id.name" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 style="text-align:center;font-weight:bold;margin:40px 0 40px 0;">Serah
+                        Terima Barang Galeri Medika</h4>
+                    <!-- Tabel Produk Servis -->
+                    <table class="table table-bordered"
+                        style="width: 100%; border-collapse: collapse;font-size:14px;" border="1">
+                        <thead>
+                            <tr style="background-color: #f0f0f0;">
+                                <th style="text-align: center; padding: 4px;width:3%;">Nama Produk</th>
+                                <th style="text-align: center; padding: 4px;width:5%">Qty</th>
+                                <th style="text-align: center; padding: 4px; width: 40%;">Deskripsi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="rec.line_ids" t-as="line">
+                                <tr>
+                                    <td
+                                        style="text-align: start; padding: 6px;vertical-align: top;width:30%;">
+                                        <span t-field="line.product_id.display_name" />
+                                    </td>
+                                    <td
+                                        style="text-align: center; padding: 6px;vertical-align: top;width:5%">
+                                        <span t-field="line.qty" />
+                                    </td>
+                                    <td style="padding: 8px; text-align: start; vertical-align: top;">
+                                        <span t-field="line.description" />
+                                    </td>
+
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <!-- Note -->
+                    <div style="margin-top: 20px; font-size:14px;">
+                        <h3>Note</h3>
+                        <div
+                            style="border: 1px solid #000; padding: 10px; min-height: 50px;">
+                            <span t-field="rec.note" t-options='{"default": ""}' />
+                        </div>
+                    </div>
+
+                    <!-- Tanda Tangan -->
+                    <div style="margin-top: 150px;">
+                        <table style="width: 100%;">
+                            <tr>
+                                <td style="width: 50%; text-align: left;">
+                                    <p style="margin-left:50px;">
+                                        <span>Yang Menerima</span>
+                                    </p>
+                                    <p style="margin-top: 80px;margin-left:50px;">
+                                        (........................)</p>
+                                </td>
+                                <td style="width: 50%; text-align: right;">
+                                    <p style="margin-right:50px;">
+                                        <span>Yang Menyerahkan</span>
+                                    </p>
+                                    <p style="margin-top: 80px;margin-right:50px;">
+                                        (.............................)</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </t>
+            <!-- </t> -->
+        </t>
+    </template>
+</odoo>
