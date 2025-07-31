@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_gm_product_service,gm_product_service,model_gm_product_service,base.group_user,1,1,1,1
+access_gm_vendor_service_line,gm_vendor_service_line,model_gm_vendor_service_line,base.group_user,1,1,1,1
+access_gm_vendor_service_to_vendor_user,gm_vendor_service_to_vendor,model_gm_vendor_service_to_vendor,base.group_user,1,1,1,1
+access_gm_vendor_service_from_vendor_user,gm_vendor_service_from_vendor,model_gm_vendor_service_from_vendor,base.group_user,1,1,1,1
