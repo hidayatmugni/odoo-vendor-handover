@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- FORM VIEW -->
+    <record id="view_vendor_service_form" model="ir.ui.view">
+        <field name="name">gm.product_service.form</field>
+        <field name="model">gm.product_service</field>
+        <field name="arch" type="xml">
+            <form string="Vendor Service Handover">
+                <header>
+                    <field name="state" widget="statusbar"
+                        statusbar_visible="open,in_progress,close" />
+                    <button name="export_excel" type="object" string="Export Excel"
+                        class="btn-primary" />
+                    <button name="%(report_vendor_service_handover)d" type="action"
+                        string="Print PDF" class="btn-primary" />
+                    <button name="export_excel_editable" type="object" string="PDF Editable"
+                        class="btn-secondary" />
+                </header>
+                <sheet>
+
+                    <!-- state Vendor Button -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(base.action_partner_form)d"
+                            type="action"
+                            class="oe_stat_button o_stat_button"
+                            icon="fa-address-book"
+                            context="{'search_default_supplier': 1}">
+                            <span>Vendor</span>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1" widget="url"
+                                options="{'url': 'javascript:void(0)', 'style': 'font-size: 16px; font-weight: bold;'}"
+                                string="Handover ID" />
+                            <field name="vendor_id" string="Nama Vendor"
+                                options="{'no_create': True, 'no_open': True}"
+                                domain="[('supplier_rank', '>', 0)]" />
+                            <field name="invoice_number" string="Nomor Invoice Pembelian" />
+                        </group>
+                        <group>
+                            <field name="outlet_id" string="Lokasi Outlet" />
+                            <field name="date_document" string="Tanggal Dokumen" />
+                            <field name="state" string="Status" />
+
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Produk Servis">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="product_id" string="Nama Produk" />
+                                    <field name="qty" string="Qty" />
+                                    <field name="description" string="Deskripsi" />
+                                    <field name="attachment_ids" widget="many2many_binary"
+                                        filename="filename" string="Foto/Video" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Note">
+                            <field name="note" nolabel="1" />
+                        </page>
+                        <page string="Serah Terima ke Vendor">
+                            <field name="to_vendor_id">
+                                <list editable="bottom">
+                                    <field name="recipient_name" string="Nama Penerima (Vendor)" />
+                                    <field name="date_sent" string="Tanggal" />
+                                    <field name="stock_move_id" string="Referensi Stock Move"
+                                        options="{'action': 'action_view_stock_move'}" />
+                                    <field name="handover_doc" widget="many2many_binary"
+                                        filename="filename" string="Foto Dokumen Serah Terima" />
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Pengembalian dari Vendor">
+                            <field name="from_vendor_id">
+                                <list editable="bottom">
+                                    <field name="recipient_name"
+                                        string="Nama Penerima (Galeri Medika)" />
+                                    <field name="date_received" string="Tanggal" />
+                                    <field name="stock_move_id" string="Referensi Stock Move"
+                                        options="{'action': 'action_view_stock_move'}" />
+                                    <field name="return_doc" widget="many2many_binary"
+                                        filename="filename" string="Foto Dokumen Penerimaan" />
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- LIST VIEW -->
+    <record id="view_vendor_service_list" model="ir.ui.view">
+        <field name="name">gm.product_service.list</field>
+        <field name="model">gm.product_service</field>
+        <field name="arch" type="xml">
+            <list string="Vendor Service Handover">
+                <field name="name" string="Handover ID" />
+                <field name="date_document" string="Tanggal Dokumen" />
+                <field name="vendor_id" string="Vendor" />
+                <field name="first_product" string="Nama Produk" />
+                <field name="first_qty" string="Qty" />
+                <field name="state" widget="badge" string="Status" />
+            </list>
+        </field>
+    </record>
+
+    <!--  search view -->
+    <record id="view_vendor_service_search" model="ir.ui.view">
+        <field name="name">gm.product_service.search</field>
+        <field name="model">gm.product_service</field>
+        <field name="arch" type="xml">
+            <search string="Search Vendor Service">
+                <!-- Filter -->
+                <filter name="date_document" string="Order Date" date="date_document" />
+                <filter name="state_open" string="Status : Open" domain="[('state', '=', 'open')]" />
+                <filter name="state_inprogress" string="Status : In Progress"
+                    domain="[('state', '=', 'in_progress')]" />
+                <filter name="state_close" string="Status : Close"
+                    domain="[('state', '=', 'close')]" />
+
+
+                <!-- Group -->
+                <group expand="0" string="Group By">
+                    <filter name="group_date" string="Tanggal Dokumen"
+                        context="{'group_by': 'date_document'}" />
+                    <filter name="group_vendor" string="Vendor" context="{'group_by': 'vendor_id'}" />
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}" />
+                    <filter name="group_produk" string="Nama Produk"
+                        context="{'group_by': 'first_product'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!--  kanban view -->
+    <record id="view_vendor_service_kanban" model="ir.ui.view">
+        <field name="name">gm.product_service.view.kanban</field>
+        <field name="model">gm.product_service</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column" default_group_by="state">
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="o_kanban_record">
+                            <!-- Badge outlet -->
+                            <div class="o_kanban_tags">
+                                <div class="badge badge-primary text-white mb-2">
+                                    <t t-esc="record.state" />
+                                </div>
+                            </div>
+
+                            <!-- Box utama -->
+                            <div class="o_kanban_details">
+                                <!-- Vendor -->
+                                <div class="mb-1">
+                                    <strong>
+                                        <field name="vendor_id" class="text-dark" />
+                                    </strong>
+                                </div>
+
+                                <!-- Alamat vendor -->
+                                <div class="text-muted small mb-1">
+                                    <t t-if="record.vendor_id.state_id">
+                                        <t t-esc="record.vendor_id.state_id.raw_value" /> - </t>
+                                    <t t-esc="record.vendor_id.zip" />
+                                </div>
+
+                                <!-- Kontak -->
+                                <div class="small mb-2">
+                                    <t t-if="record.vendor_id.mobile or record.vendor_id.phone">
+                                        <span class="text-muted">Telp: </span>
+                                        <t t-if="record.vendor_id.mobile">
+                                            <t t-esc="record.vendor_id.mobile" />
+                                        </t>
+                                        <t t-if="record.vendor_id.mobile and record.vendor_id.phone">
+                                            <span> / </span>
+                                        </t>
+                                        <t t-if="record.vendor_id.phone">
+                                            <t t-esc="record.vendor_id.phone" />
+                                        </t>
+                                    </t>
+                                </div>
+
+                                <!-- ID Handover -->
+                                <div>
+                                    <span class="small text-muted">ID Handover:</span>
+                                    <br />
+                                    <span class="fw-bold">
+                                        <t t-esc="record.name" />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ACTION -->
+    <record id="action_vendor_service" model="ir.actions.act_window">
+        <field name="name">Vendor Service</field>
+        <field name="res_model">gm.product_service</field>
+        <field name="view_mode">list,form,search,kanban</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Klik New Buat "Record Baru"
+            </p>
+        </field>
+    </record>
+
+    <!-- ACTION UNTUK LINE ITEMS -->
+    <record id="action_vendor_service_line" model="ir.actions.act_window">
+        <field name="name">Produk Servis</field>
+        <field name="res_model">gm.vendor_service_line</field>
+        <field name="view_mode">list,form</field>
+        <!-- <field name="domain">[('handover_id', '=', active_id)]</field>
+        <field name="context">{'default_handover_id': active_id}</field> -->
+    </record>
+
+    <!-- VIEW UNTUK LINE ITEMS -->
+    <record id="view_vendor_service_line_list" model="ir.ui.view">
+        <field name="name">gm.vendor_service_line.list</field>
+        <field name="model">gm.vendor_service_line</field>
+        <field name="arch" type="xml">
+            <list string="Produk Servis">
+                <field name="product_id" string="Nama Produk" />
+                <field name="qty" string="Qty" />
+                <field name="description" string="Deskripsi" />
+                <field name="attachment_ids" widget="many2many_binary" filename="filename"
+                    string="Foto/Video" />
+            </list>
+        </field>
+    </record>
+
+    <!-- ACTION UNTUK STOCK MOVE -->
+    <record id="action_view_stock_move" model="ir.actions.act_window">
+        <field name="name">Stock Move</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="domain">[('id', '=', parent.id)]</field>
+    </record>
+
+    <!-- MENU -->
+    <menuitem id="menu_vendor_service_root" name="GM Product Service" sequence="10" />
+    <menuitem id="menu_vendor_service_main" name="Handover" parent="menu_vendor_service_root"
+        action="action_vendor_service" />
+    <menuitem id="menu_vendor_service_line" name="Produk Servis" parent="menu_vendor_service_main"
+        action="action_vendor_service_line" />
+
+
+</odoo>
